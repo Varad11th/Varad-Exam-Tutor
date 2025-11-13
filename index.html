@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Varad's Exam Tutor</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Add MathJax configuration and script -->
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+    <!-- Load MathJax -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg-full.js" id="MathJax-script" async></script>
+
+    <style>
+        /* Use Inter as the default font */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for a better dark-mode feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1b2e;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #6d28d9;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #5b21b6;
+        }
+        /* Simple spinner animation */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #c084fc; /* Default Purple-400 */
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        /* Small spinner for button */
+        .spinner-sm {
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 2px solid #fff;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Handle MathJax overflow */
+        mjx-container {
+            max-width: 100%;
+            overflow-x: auto;
+            padding-bottom: 4px; 
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e] text-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-4xl mx-auto">
+        
+        <!-- Landing Page Section -->
+        <section id="landing" class="text-center p-8 bg-black bg-opacity-30 backdrop-blur-lg rounded-2xl shadow-2xl border border-purple-800 border-opacity-30">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 text-purple-300">
+                Varad's Exam Tutor
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 mb-12">
+                Your dedicated tool for finding topic-wise Previous Year Questions.
+            </p>
+
+            <!-- Features -->
+            <div class="grid md:grid-cols-2 gap-6 text-left mb-12">
+                <div class="bg-gray-900 bg-opacity-50 p-6 rounded-lg border border-purple-700">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                        </svg>
+                        <h3 class="text-xl font-semibold text-purple-300">Targeted Practice</h3>
+                    </div>
+                    <p class="text-gray-300">
+                        Find questions for specific chapters and topics to strengthen your weak areas.
+                    </p>
+                </div>
+                <div class="bg-gray-900 bg-opacity-50 p-6 rounded-lg border border-purple-700">
+                    <div class="flex items-center space-x-3 mb-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12.75 15l3-3m0 0l-3-3m3 3h-7.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 class="text-xl font-semibold text-purple-300">Simple & Fast</h3>
+                    </div>
+                    <p class="text-gray-300">
+                        Get relevant PYQs in seconds with our simple, clean interface.
+                    </p>
+                </div>
+            </div>
+
+            <button id="get-started-btn" class="w-full sm:w-auto px-8 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50">
+                Get Started
+            </button>
+        </section>
+
+        <!-- NEW: Exam Selection Section -->
+        <section id="exam-selection" class="hidden text-center p-8 bg-black bg-opacity-30 backdrop-blur-lg rounded-2xl shadow-2xl border border-purple-800 border-opacity-30">
+            <h2 class="text-3xl font-bold text-purple-300 mb-8">What exam are you preparing for?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+                <!-- JEE Button -->
+                <button id="btn-jee" class="p-6 bg-gray-900 bg-opacity-50 rounded-xl border border-blue-700 hover:bg-blue-900 hover:bg-opacity-40 transition-all duration-300 group">
+                    <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <span class="text-2xl font-bold text-white">JEE</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-blue-300">Mains & Advanced</h3>
+                </button>
+
+                <!-- NEET Button -->
+                <button id="btn-neet" class="p-6 bg-gray-900 bg-opacity-50 rounded-xl border border-green-700 hover:bg-green-900 hover:bg-opacity-40 transition-all duration-300 group">
+                    <div class="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <span class="text-2xl font-bold text-white">NEET</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-green-300">Medical Entrance</h3>
+                </button>
+
+                <!-- CET Button -->
+                <button id="btn-cet" class="p-6 bg-gray-900 bg-opacity-50 rounded-xl border border-orange-700 hover:bg-orange-900 hover:bg-opacity-40 transition-all duration-300 group">
+                    <div class="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg group-hover:scale-110 transition-transform">
+                        <span class="text-2xl font-bold text-white">CET</span>
+                    </div>
+                    <h3 class="text-xl font-semibold text-orange-300">State CETs</h3>
+                </button>
+            </div>
+            
+            <div class="mt-8">
+                 <button id="back-to-home-from-select" class="text-sm text-gray-400 hover:text-white transition-colors bg-transparent">&larr; Back to Home</button>
+            </div>
+        </section>
+
+        <!-- Search Form Section (Dynamic) -->
+        <section id="search" class="hidden p-8 bg-black bg-opacity-30 backdrop-blur-lg rounded-2xl shadow-2xl border border-purple-800 border-opacity-30">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="search-title" class="text-3xl font-bold text-purple-300">Find Questions</h2>
+                <button id="back-to-selection-btn" class="text-sm text-purple-300 hover:text-purple-100 bg-transparent">&larr; Change Exam</button>
+            </div>
+            
+            <form id="search-form">
+                <div class="space-y-6">
+                    <!-- Exam Variant Dropdown -->
+                    <div>
+                        <label for="exam-variant" class="block text-sm font-medium text-gray-300 mb-2">Specific Exam</label>
+                        <select id="exam-variant" name="exam-variant" class="w-full px-4 py-3 bg-gray-900 bg-opacity-70 border border-purple-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                            <!-- Options populated by JS -->
+                        </select>
+                    </div>
+
+                    <!-- Topic -->
+                    <div>
+                        <label for="topic" class="block text-sm font-medium text-gray-300 mb-2">Topic(s)</label>
+                        <input type="text" id="topic" name="topic" required class="w-full px-4 py-3 bg-gray-900 bg-opacity-70 border border-purple-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="e.g., 'Kinematics'">
+                    </div>
+
+                    <!-- Number of Results -->
+                    <div>
+                        <label for="num-results" class="block text-sm font-medium text-gray-300 mb-2">Number of Questions</label>
+                        <input type="number" id="num-results" name="num-results" min="1" max="10" value="5" class="w-full px-4 py-3 bg-gray-900 bg-opacity-70 border border-purple-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent" placeholder="e.g., 5">
+                    </div>
+
+                    <!-- Search Button -->
+                    <div>
+                        <button type="submit" class="w-full px-8 py-3 bg-purple-600 text-white font-semibold rounded-lg shadow-lg hover:bg-purple-700 transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            <!-- Loading Indicator -->
+            <div id="loading" class="hidden flex flex-col items-center justify-center py-12">
+                <div class="spinner"></div>
+                <p class="mt-4 text-purple-300">Finding questions...</p>
+            </div>
+        </section>
+
+        <!-- Results Section -->
+        <section id="results" class="hidden p-8 bg-black bg-opacity-30 backdrop-blur-lg rounded-2xl shadow-2xl border border-purple-800 border-opacity-30">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold text-purple-300">Results</h2>
+                <button id="back-to-search-btn" class="text-sm text-purple-300 hover:text-purple-100 bg-transparent">&larr; New Search</button>
+            </div>
+            
+            <div id="results-content" class="space-y-6">
+                <!-- Generated text will go here -->
+                <div id="generated-text" class="p-6 bg-gray-900 bg-opacity-70 rounded-lg border border-purple-700 text-gray-200 whitespace-pre-wrap break-words"></div>
+                
+                <!-- Answer Key Button and Loader -->
+                <div class="text-center py-4">
+                    <button id="show-answers-btn" class="w-full sm:w-auto px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 focus:ring-opacity-50">
+                        Show Answer Key
+                    </button>
+                    <div id="answers-loading" class="hidden flex items-center justify-center py-2">
+                        <div class="spinner-sm mr-3"></div>
+                        <span class="text-purple-300">Finding answers...</span>
+                    </div>
+                </div>
+                
+                <!-- Answer Key Content -->
+                <div id="answers-content" class="hidden p-6 bg-gray-900 bg-opacity-70 rounded-lg border border-purple-700 text-gray-200 whitespace-pre-wrap break-words"></div>
+
+                <!-- Uplifting Message -->
+                <div id="uplifting-message" class="mt-8 pt-6 border-t border-purple-800 text-center">
+                    <p class="text-lg text-purple-300 font-medium">
+                        Great job on your search! Keep up the hard work. Your dedication is the key to success. You've got this! 💪
+                    </p>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-70 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="w-full max-w-md bg-[#1e1b2e] rounded-2xl shadow-2xl p-6 border border-purple-700">
+            <h3 class="text-2xl font-bold text-red-400 mb-4">Error</h3>
+            <p id="error-message" class="text-gray-300 mb-6">Something went wrong.</p>
+            <button id="close-modal-btn" class="w-full px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500">
+                Close
+            </button>
+        </div>
+    </div>
+
+
+    <script type="module">
+        window.addEventListener('DOMContentLoaded', () => {
+    // --- Global State ---
+    let currentQuestions = "";
+    let currentExamCategory = ""; // 'JEE', 'NEET', or 'CET'
+
+    // --- Element Selection ---
+    const landingPage = document.getElementById('landing');
+    const examSelectionPage = document.getElementById('exam-selection');
+    const searchPage = document.getElementById('search');
+    const resultsPage = document.getElementById('results');
+    
+    // Buttons
+    const getStartedBtn = document.getElementById('get-started-btn');
+    const backToHomeFromSelectBtn = document.getElementById('back-to-home-from-select');
+    const backToSelectionBtn = document.getElementById('back-to-selection-btn');
+    const backToSearchBtn = document.getElementById('back-to-search-btn');
+
+    // Exam Buttons
+    const btnJEE = document.getElementById('btn-jee');
+    const btnNEET = document.getElementById('btn-neet');
+    const btnCET = document.getElementById('btn-cet');
+
+    // Search Form Elements
+    const searchForm = document.getElementById('search-form');
+    const searchFormContainer = document.querySelector('#search form');
+    const searchTitle = document.getElementById('search-title');
+    const examVariantSelect = document.getElementById('exam-variant');
+    const topicInput = document.getElementById('topic');
+    const loadingIndicator = document.getElementById('loading');
+    
+    // Results Elements
+    const resultsContent = document.getElementById('results-content');
+    const generatedTextEl = document.getElementById('generated-text');
+    const showAnswersBtn = document.getElementById('show-answers-btn');
+    const answersLoading = document.getElementById('answers-loading');
+    const answersContentEl = document.getElementById('answers-content');
+
+    // Modal
+    const errorModal = document.getElementById('error-modal');
+    const errorMessageEl = document.getElementById('error-message');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+
+    // --- Theme Configuration ---
+    const colorCodes = {
+        'blue': '#60a5fa', // blue-400
+        'green': '#4ade80', // green-400
+        'orange': '#fb923c', // orange-400
+        'purple': '#c084fc' // purple-400 (original)
+    };
+    const allColors = ['purple', 'blue', 'green', 'orange'];
+
+
+    // --- Configuration Data ---
+    const examConfigs = {
+        'JEE': {
+            title: "Find JEE Questions",
+            variants: ["JEE Mains", "JEE Advanced"],
+            placeholder: "e.g., 'Kinematics', 'Organic Chemistry'"
+        },
+        'NEET': {
+            title: "Find NEET Questions",
+            variants: ["NEET UG"],
+            placeholder: "e.g., 'Human Physiology', 'Genetics'"
+        },
+        'CET': {
+            title: "Find CET Questions",
+            variants: ["MHT-CET", "KCET", "WBJEE", "COMEDK"],
+            placeholder: "e.g., 'Vector Algebra', 'Electrostatics'"
+        }
+    };
+
+    // --- Theme Application Logic ---
+    function applyTheme(color) {
+        const borderElements = [
+            { el: searchPage, level: 800 },
+            { el: resultsPage, level: 800 },
+            { el: document.getElementById('uplifting-message'), level: 800 },
+            { el: examVariantSelect, level: 700, ring: 500 },
+            { el: topicInput, level: 700, ring: 500 },
+            { el: document.getElementById('num-results'), level: 700, ring: 500 },
+            { el: generatedTextEl, level: 700 },
+            { el: answersContentEl, level: 700 }
+        ];
+
+        const elementsToTheme = [
+            searchTitle, 
+            backToSelectionBtn, 
+            backToSearchBtn, 
+            document.querySelector('#loading p'), 
+            document.querySelector('#uplifting-message p'), 
+            document.querySelector('#answers-loading span'),
+            document.querySelector('#search-form button[type="submit"]'), 
+            showAnswersBtn
+        ];
+
+        elementsToTheme.forEach(el => {
+            if (!el) return;
+            const isNavLink = (el === backToSelectionBtn || el === backToSearchBtn);
+
+            allColors.forEach(oldColor => {
+                el.classList.remove(`text-${oldColor}-300`);
+                el.classList.remove(`bg-${oldColor}-600`);
+                el.classList.remove(`hover:bg-${oldColor}-700`);
+                el.classList.remove(`focus:ring-${oldColor}-500`);
+                if (isNavLink) {
+                    el.classList.remove(`hover:text-${oldColor}-100`);
+                }
+            });
+
+            el.classList.add(`text-${color}-300`);
+            if (isNavLink) {
+                el.classList.add(`hover:text-${color}-100`);
+            }
+
+            if (el.tagName === 'BUTTON' || el.type === 'submit') {
+                el.classList.add(`bg-${color}-600`);
+                el.classList.add(`hover:bg-${color}-700`);
+                el.classList.add(`focus:ring-${color}-500`);
+            }
+        });
+        
+        borderElements.forEach(item => {
+            const el = item.el;
+            if (!el) return;
+            allColors.forEach(oldColor => {
+                el.classList.remove(`border-${oldColor}-${item.level}`);
+                if (item.ring) {
+                    el.classList.remove(`focus:ring-${oldColor}-${item.ring}`);
+                }
+            });
+            el.classList.add(`border-${color}-${item.level}`);
+            if (item.ring) {
+                el.classList.add(`focus:ring-${color}-${item.ring}`);
+            }
+        });
+
+        let style = document.getElementById('theme-style');
+        if (!style) {
+            style = document.createElement('style');
+            style.id = 'theme-style';
+            document.head.appendChild(style);
+        }
+        
+        const spinnerColor = colorCodes[color] || colorCodes['purple'];
+        style.textContent = `
+            .spinner {
+                border-top: 4px solid ${spinnerColor} !important;
+            }
+        `;
+    }
+
+
+    // --- Page Navigation Logic ---
+    getStartedBtn.addEventListener('click', () => {
+        landingPage.classList.add('hidden');
+        examSelectionPage.classList.remove('hidden');
+    });
+
+    backToHomeFromSelectBtn.addEventListener('click', () => {
+        examSelectionPage.classList.add('hidden');
+        landingPage.classList.remove('hidden');
+    });
+
+    function openSearchPage(examCategory) {
+        currentExamCategory = examCategory;
+        const config = examConfigs[examCategory];
+        
+        let color = 'purple';
+        if (examCategory === 'JEE') color = 'blue';
+        else if (examCategory === 'NEET') color = 'green';
+        else if (examCategory === 'CET') color = 'orange';
+
+        applyTheme(color);
+
+        searchTitle.textContent = config.title;
+        topicInput.placeholder = config.placeholder;
+
+        examVariantSelect.innerHTML = '';
+        config.variants.forEach(variant => {
+            const option = document.createElement('option');
+            option.value = variant;
+            option.textContent = variant;
+            examVariantSelect.appendChild(option);
+        });
+
+        examSelectionPage.classList.add('hidden');
+        searchPage.classList.remove('hidden');
+        searchFormContainer.classList.remove('hidden');
+    }
+
+    btnJEE.addEventListener('click', () => openSearchPage('JEE'));
+    btnNEET.addEventListener('click', () => openSearchPage('NEET'));
+    btnCET.addEventListener('click', () => openSearchPage('CET'));
+
+    backToSelectionBtn.addEventListener('click', () => {
+        applyTheme('purple');
+        searchPage.classList.add('hidden');
+        examSelectionPage.classList.remove('hidden');
+    });
+
+    backToSearchBtn.addEventListener('click', () => {
+        resultsPage.classList.add('hidden');
+        searchPage.classList.remove('hidden');
+        searchFormContainer.classList.remove('hidden');
+        
+        currentQuestions = "";
+        answersContentEl.classList.add('hidden');
+        answersContentEl.textContent = "";
+        showAnswersBtn.classList.remove('hidden');
+        showAnswersBtn.textContent = 'Show Answer Key';
+        answersLoading.classList.add('hidden');
+    });
+
+
+    // --- Modal Controls ---
+    function showModal(message) {
+        errorMessageEl.textContent = message;
+        errorModal.classList.remove('hidden');
+    }
+    closeModalBtn.addEventListener('click', () => errorModal.classList.add('hidden'));
+
+    // --- MathJax Helper ---
+    function renderMathInElement(element) {
+        if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+            window.MathJax.typesetPromise([element]).catch(err => console.error('MathJax typeset error:', err));
+        }
+    }
+
+    // --- API Call Logic ---
+    const apiUrl = 'YOUR_WORKER_PROXY_URL_HERE'; 
+
+    async function fetchWithBackoff(url, options, retries = 5, delay = 1000) {
+        for (let i = 0; i < retries; i++) {
+            try {
+                const response = await fetch(url, options);
+                if (response.ok) return await response.json();
+                if (response.status === 429) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    delay *= 2;
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            } catch (error) {
+                if (i === retries - 1) throw error;
+                await new Promise(resolve => setTimeout(resolve, delay));
+                delay *= 2;
+            }
+        }
+    }
+
+    function displayResults(text) {
+        generatedTextEl.textContent = text;
+        currentQuestions = text;
+        renderMathInElement(generatedTextEl);
+        searchPage.classList.add('hidden');
+        resultsPage.classList.remove('hidden');
+    }
+
+    // --- Question Search ---
+    searchForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const selectedVariant = examVariantSelect.value;
+        const topic = topicInput.value;
+        const numResults = document.getElementById('num-results').value;
+
+        searchFormContainer.classList.add('hidden');
+        loadingIndicator.classList.remove('hidden');
+
+        const userQuery = `Find ${numResults} ${selectedVariant} previous year questions (PYQs) on the topic of "${topic}". Provide the full question text and all its multiple-choice options.`;
+        
+        const systemPrompt = `You are a helpful assistant for ${currentExamCategory} aspirants. Your task is to find previous year questions (PYQs).
+- You MUST use Google Search to find this information.
+- The user wants ${numResults} questions from ${selectedVariant}.
+- Present the questions clearly, including the full question text and all multiple-choice options.
+- *CRITICAL Rules for Images:*
+  1. Describe simple images/circuits in text if possible.
+  2. SKIP questions with complex visuals that cannot be described. Find a replacement.
+  3. DO NOT output "See figure below" without a figure.
+- If fewer than ${numResults} questions are found, list what you found and add 'Note: No more usable questions match your search.'
+- Do not hallucinate questions.`;
+
+        const payload = {
+            contents: [{ parts: [{ text: userQuery }] }],
+            tools: [{ "google_search": {} }],
+            systemInstruction: { parts: [{ text: systemPrompt }] },
+        };
+
+        try {
+            const result = await fetchWithBackoff(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const candidate = result.candidates?.[0];
+
+            if (candidate && candidate.content?.parts?.[0]?.text) {
+                displayResults(candidate.content.parts[0].text);
+            } else if (result.error) {
+                 showModal(result.error);
+                 searchFormContainer.classList.remove('hidden');
+            } else {
+                showModal('Could not find any results. Please try a different query.');
+                searchFormContainer.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showModal('A network error occurred. Ensure the proxy URL is set correctly.');
+            searchFormContainer.classList.remove('hidden');
+        } finally {
+            loadingIndicator.classList.add('hidden');
+        }
+    });
+
+    // --- Answer Key Logic ---
+    showAnswersBtn.addEventListener('click', async () => {
+        if (!answersContentEl.classList.contains('hidden')) {
+            answersContentEl.classList.add('hidden');
+            showAnswersBtn.textContent = 'Show Answer Key';
+            return;
+        }
+
+        if (answersContentEl.textContent.trim().length > 0) {
+            answersContentEl.classList.remove('hidden');
+            showAnswersBtn.textContent = 'Hide Answer Key';
+            return;
+        }
+
+        showAnswersBtn.classList.add('hidden');
+        answersLoading.classList.remove('hidden');
+
+        const userQuery = `Here is a list of questions:\n\n${currentQuestions}\n\nProvide ONLY the answer key (e.g., "1. (A)"). No explanations.`;
+        const systemPrompt = 'You are an answer key generator. Provide ONLY the answer key list. No conversation.';
+
+        const payload = {
+            contents: [{ parts: [{ text: userQuery }] }],
+            systemInstruction: { parts: [{ text: systemPrompt }] }
+        };
+
+        try {
+            const result = await fetchWithBackoff(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            
+            const candidate = result.candidates?.[0];
+            if (candidate && candidate.content?.parts?.[0]?.text) {
+                answersContentEl.textContent = candidate.content.parts[0].text;
+                renderMathInElement(answersContentEl);
+                answersContentEl.classList.remove('hidden');
+                showAnswersBtn.textContent = 'Hide Answer Key';
+            } else if (result.error) {
+                 showModal(result.error);
+            } else {
+                showModal('Could not fetch answers.');
+            }
+        } catch (error) {
+            showModal('A network error occurred while fetching answers.');
+        } finally {
+            answersLoading.classList.add('hidden');
+            showAnswersBtn.classList.remove('hidden');
+        }
+    });
+});
+</script>
+</body>
+</html>
